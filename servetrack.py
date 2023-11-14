@@ -36,7 +36,6 @@ while os.path.isfile(output_path):
     filecount += 1
     output_path = 'output/angletest/track%d.mp4' % filecount
 
-cv2.putText(img, f'output_path', 0, 0, cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
 ####LOG MAKER for debugging purposes
 logcount = 0
 log_file = 'output/logs/angletest/log%d.txt' % logcount
@@ -145,8 +144,8 @@ def line_render(points, img, line_color):
 
     return round(angle, 2), round(bal_diff_y, 2), round(bal_diff_x, 2), counter 
 while True:
-    ret, img = cap.read()
-    
+    ret, img = cap.read() 
+    cv2.putText(img, f'output_path', (120, 120), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
     if not ret:
         break
 
