@@ -158,8 +158,8 @@ while True:
     if not ret:
         break
     
-    height, width, _ = frame.shape
-    print(height, width)
+    height, width, _ = img.shape
+    #print(height, width)
     roi = img[50: 650, 150: 1050]
     progress.update(1)
     results = model(img, stream=True, verbose=False)
