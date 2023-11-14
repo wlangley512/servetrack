@@ -152,10 +152,10 @@ while True:
     if not ret:
         break
     
-    roi = img[50: 700,150: 1050]
+    roi = img[50: 650,150: 1050]
     cv2.putText(roi, video, (300, 700), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
     progress.update(1)
-    results = model(img, stream=True, verbose=False)
+    results = model(roi, stream=True, verbose=False)
     for r in results:
         boxes = r.boxes
         for box in boxes:
