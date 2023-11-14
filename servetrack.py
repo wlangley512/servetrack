@@ -113,8 +113,8 @@ def line_render(points, img, line_color):
 
         if points[i - 1] is None or points[i] is None:
             continue
-        diff_x = points[i-3][0] - points[i][0]
-        diff_y = points[i-3][1] - points[i][1]
+        diff_x = points[i-5][0] - points[i][0]
+        diff_y = points[i-5][1] - points[i][1]
         
         bal_diff_y = diff_y / balance
         bal_diff_x = diff_x / balance 
