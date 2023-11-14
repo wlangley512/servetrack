@@ -87,7 +87,7 @@ def calculate_angle(segment1, segment2):
     #angle_degrees = np.degrees(angle_radians)
     angle_radians = np.arctan2(np.linalg.det([vector1, vector2]), np.dot(vector1, vector2))
     angle_degrees = np.degrees(angle_radians)
-    return math.ceil(np.abs(angle_degrees))
+    return math.ceil(angle_degrees)
 
 def line_render(points, img, line_color):
     balance = 30 / fps
@@ -124,8 +124,13 @@ def line_render(points, img, line_color):
         else: 
             consecutive_negative_frames = 0
 
+        #if bal_diff_y > 0:
+        #    consecutive_positive_frames +=1 
+        #else:
+        #    consecutive_positive_frames =0
+
         print("angle: " ,  angle, file=lf)
-       
+           
         #prevent false positive at start if player lower balls before toss
         counter+=1
 
@@ -153,6 +158,9 @@ while True:
     if not ret:
         break
     
+    height, width, _ = frame.shape
+    print(height, width)
+    roi = [50: 650, 150, 1050]
     progress.update(1)
     results = model(img, stream=True, verbose=False)
     for r in results:
