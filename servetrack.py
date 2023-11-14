@@ -107,8 +107,8 @@ def line_render(points, img, line_color):
     for i in range(3, len(points) - 1):
         #print("X Point: ", points[i][0], file=lf)
         #total_mag = 0
-        segment1 = (points[i-2]+points[i-3], points[i-1]+points[i-2])
-        segment2 = (points[i-1]+points[i-2], points[i]+points[i-1])
+        segment1 = (points[i-2], points[i-1])
+        segment2 = (points[i-1], points[i])
 
         if points[i - 1] is None or points[i] is None:
             continue
@@ -132,7 +132,7 @@ def line_render(points, img, line_color):
         #if this works it sucks
         #update: jesus christ
         if tossed:
-            cv2.line(img, points[i-1], points[i], (0, 255, 0), 2)
+            cv2.line(img, points[i-1]+points[i-2], points[i]+points[i-1], (0, 255, 0), 2)
             poop_diff = "Toss"
             tossed = True
             if (consecutive_negative_frames >= 5 and counter > 15 and np.abs(bal_diff_x) > 5):
@@ -142,7 +142,7 @@ def line_render(points, img, line_color):
         elif served:
             #if np.abs(diff_x) > 3 and np.abs(diff_y) > 3:
             poop_diff = "Serv"
-            cv2.line(img, points[i-1], points[i], (0, 0, 255), 2)
+            cv2.line(img, points[i-1]+points[i-2], points[i]+points[i-1], (0, 0, 255), 2)
             #else: 
             #    cv2.line(img, points[i-1], points[i], (0, 255, 0), 2)
 
