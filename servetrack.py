@@ -36,6 +36,7 @@ while os.path.isfile(output_path):
     filecount += 1
     output_path = 'output/angletest/track%d.mp4' % filecount
 
+cv2.putText(img, f'output_path', 0, 0, cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
 ####LOG MAKER for debugging purposes
 logcount = 0
 log_file = 'output/logs/angletest/log%d.txt' % logcount
@@ -186,7 +187,7 @@ while True:
                     #elif line_color == (0, 0, 255):
                     #    cv2.putText(img, f'le epic serve detected', (max(0, x1), max(30, y1)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
                 if currentClass == "ball":
-                    cv2.putText(img, f'{total_mag}', (max(-100, x1), max(30, y1)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+                    cv2.putText(img, f'{total_mag}', (max(30, x1), max(30, y1)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
     
         total_mag = line_render(center_points, img, line_color)
         #Draw line
