@@ -89,7 +89,7 @@ def calculate_angle(segment1, segment2):
     angle_degrees = np.degrees(angle_radians)
     return math.ceil(np.abs(angle_degrees))
 
-def line_render(points, roi, line_color):
+def line_render(points, img, line_color):
     balance = 30 / fps
     angle = 0
     counter = 0
@@ -132,7 +132,7 @@ def line_render(points, roi, line_color):
         #if this works it sucks
         #update: jesus christ
         if tossed:
-            cv2.line(roi, points[i-1], points[i], (0, 255, 0), 2)
+            cv2.line(img, points[i-1], points[i], (0, 255, 0), 2)
             poop_diff = "Toss"
             tossed = True
             if (consecutive_negative_frames >= 5 and counter > 15 and np.abs(bal_diff_x) > 5):
@@ -142,20 +142,19 @@ def line_render(points, roi, line_color):
         elif served:
             #if np.abs(diff_x) > 3 and np.abs(diff_y) > 3:
             poop_diff = "Serv"
-            cv2.line(roi, points[i-1], points[i], (0, 0, 255), 2)
+            cv2.line(img, points[i-1], points[i], (0, 0, 255), 2)
             #else: 
             #    cv2.line(img, points[i-1], points[i], (0, 255, 0), 2)
 
     return round(angle, 2), round(bal_diff_x, 2), round(bal_diff_y, 2), consecutive_negative_frames 
 while True:
     ret, img = cap.read() 
+    cv2.putText(img, video, (300, 700), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
     if not ret:
         break
     
-    roi = img[50: 650,150: 1050]
-    cv2.putText(roi, video, (300, 700), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
     progress.update(1)
-    results = model(roi, stream=True, verbose=False)
+    results = model(img, stream=True, verbose=False)
     for r in results:
         boxes = r.boxes
         for box in boxes:
@@ -174,7 +173,7 @@ while True:
 
                 # Create mid points and bounding box
                 center_points.append((cx, cy)) 
-                cv2.rectangle (roi, (x1, y1), (x2, y2), (255, 255, 0), 1)
+                cv2.rectangle (img, (x1, y1), (x2, y2), (255, 255, 0), 1)
                  
                 #for pt in center_points:
                 #     cv2.circle(img, pt, 2, (255, 0, 0), -1)
@@ -191,16 +190,16 @@ while True:
                     #elif line_color == (0, 0, 255):
                     #    cv2.putText(img, f'le epic serve detected', (max(0, x1), max(30, y1)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
                 if currentClass == "ball":
-                    cv2.putText(roi, f'{total_mag}', (max(30, x1), max(30, y1)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+                    cv2.putText(img, f'{total_mag}', (max(30, x1), max(30, y1)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
          
-        total_mag = line_render(center_points, roi, line_color)
+        total_mag = line_render(center_points, img, line_color)
         #Draw line
         #if len(center_points)>=2:
         #    for i in range (1, len(center_points)):
         #        cv2.line(img, center_points[i - 1], center_points[i], line_color, 2)
     
     
-    final.write(roi)
+    final.write(img)
     #cv2.imshow("Image", img)
     cv2.waitKey(1)
     
