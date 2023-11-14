@@ -87,7 +87,7 @@ def calculate_angle(segment1, segment2):
     #angle_degrees = np.degrees(angle_radians)
     angle_radians = np.arctan2(np.linalg.det([vector1, vector2]), np.dot(vector1, vector2))
     angle_degrees = np.degrees(angle_radians)
-    return math.ceil(angle_degrees)
+    return np.abs(math.ceil(angle_degrees))
 
 def line_render(points, img, line_color):
     balance = 30 / fps
