@@ -93,12 +93,11 @@ def line_render(points, img, line_color):
     balance = 30 / fps
     angle = 0
     counter = 0
-    bagaga = 0
     diff_y = 0
     diff_x = 0
     bal_diff_y = 0
     bal_diff_x = 0
-    poop_diff = None
+    consecutive_negative_frames = 0
     tossed =  True
     served = False
     passed = False
@@ -120,6 +119,11 @@ def line_render(points, img, line_color):
         bal_diff_x = diff_x / balance 
         angle = calculate_angle(segment1, segment2)
         
+        if bal_diff_y < 0:
+            consecutive_negative_frames += 1
+        else: 
+            consecutive_negative_frames = 0
+
         print("angle: " ,  angle, file=lf)
        
         #prevent false positive at start if player lower balls before toss
@@ -131,7 +135,7 @@ def line_render(points, img, line_color):
             cv2.line(img, points[i-1], points[i], (0, 255, 0), 2)
             poop_diff = "Toss"
             tossed = True
-            if (bal_diff_y <= -10 and counter > 15 and np.abs(bal_diff_x) > 10):
+            if (consecutive_negative_frames >= 5 and counter > 15 and np.abs(bal_diff_x) > 5):
                 if angle > 3 and angle < 30:
                     tossed = False
                     served = True
@@ -142,7 +146,7 @@ def line_render(points, img, line_color):
             #else: 
             #    cv2.line(img, points[i-1], points[i], (0, 255, 0), 2)
 
-    return round(angle, 2), round(bal_diff_x, 2), round(bal_diff_y, 2), counter 
+    return round(angle, 2), round(bal_diff_x, 2), round(bal_diff_y, 2), consecutive_negative_frames 
 while True:
     ret, img = cap.read() 
     cv2.putText(img, video, (300, 700), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
