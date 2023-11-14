@@ -104,7 +104,7 @@ def line_render(points, img, line_color):
     #color = (0, 255, 255)
     if len(points) < 3:
         return
-    for i in range(3, len(points) - 1):
+    for i in range(3, len(points) - 1, 2):
         #print("X Point: ", points[i][0], file=lf)
         #total_mag = 0
         segment1 = (points[i-2], points[i-1])
@@ -191,16 +191,14 @@ while True:
                     #    cv2.putText(img, f'le epic serve detected', (max(0, x1), max(30, y1)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
                 if currentClass == "ball":
                     cv2.putText(img, f'{total_mag}', (max(30, x1), max(30, y1)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
-            # Only process every other frame
-        if count % 2 == 0:
-            total_mag = line_render(center_points, img, line_color) 
-        #total_mag = line_render(center_points, img, line_color)
+         
+        total_mag = line_render(center_points, img, line_color)
         #Draw line
         #if len(center_points)>=2:
         #    for i in range (1, len(center_points)):
         #        cv2.line(img, center_points[i - 1], center_points[i], line_color, 2)
     
-    count+=1
+    
     final.write(img)
     #cv2.imshow("Image", img)
     cv2.waitKey(1)
