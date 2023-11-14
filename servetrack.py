@@ -160,7 +160,7 @@ while True:
     
     height, width, _ = frame.shape
     print(height, width)
-    roi = [50: 650, 150: 1050]
+    roi = img[50: 650, 150: 1050]
     progress.update(1)
     results = model(img, stream=True, verbose=False)
     for r in results:
