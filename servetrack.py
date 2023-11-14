@@ -126,7 +126,7 @@ def line_render(points, img, line_color):
         
         bal_diff_y = diff_y / balance
         bal_diff_x = diff_x / balance 
-        angle = calculate_angle(segment1, segment2[0], segment2[1])
+        angle = calculate_angle(segment1[0], segment1[1], segment2[1])
         
         if bal_diff_y < 0:
             consecutive_negative_frames += 1
