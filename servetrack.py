@@ -79,14 +79,14 @@ def filter_outliers(center_points, max_deviation):
 def calculate_angle(segment1, segment2): 
     vector1 = np.array([segment1[1][0] - segment1[0][0], segment1[1][1] - segment1[0][1]])
     vector2 = np.array([segment2[1][0] - segment2[0][0], segment2[1][1] - segment2[0][1]]) 
-    dot_product = np.dot(vector1, vector2)
-    magnitude1 = np.linalg.norm(vector1)
-    magnitude2 = np.linalg.norm(vector2)
-    cosine_angle = dot_product / (magnitude1 * magnitude2)
-    angle_radians = np.arccos(np.clip(cosine_angle, -1.0, 1.0)) 
-    angle_degrees = np.degrees(angle_radians)
-    #angle_radians = np.arctan2(np.linalg.det([vector1, vector2]), np.dot(vector1, vector2))
+    #dot_product = np.dot(vector1, vector2)
+    #magnitude1 = np.linalg.norm(vector1)
+    #magnitude2 = np.linalg.norm(vector2)
+    #cosine_angle = dot_product / (magnitude1 * magnitude2)
+    #angle_radians = np.arccos(np.clip(cosine_angle, -1.0, 1.0)) 
     #angle_degrees = np.degrees(angle_radians)
+    angle_radians = np.arctan2(np.linalg.det([vector1, vector2]), np.dot(vector1, vector2))
+    angle_degrees = np.degrees(angle_radians)
     return np.abs(angle_degrees)
 
 def line_render(points, img, line_color):
