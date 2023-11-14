@@ -142,7 +142,7 @@ def line_render(points, img, line_color):
             #else: 
             #    cv2.line(img, points[i-1], points[i], (0, 255, 0), 2)
 
-    return round(angle, 2), bal_diff_y, bal_diff_x, counter 
+    return round(angle, 2), round(bal_diff_y, 2), round(bal_diff_x, 2), counter 
 while True:
     ret, img = cap.read()
     
@@ -186,7 +186,7 @@ while True:
                     #elif line_color == (0, 0, 255):
                     #    cv2.putText(img, f'le epic serve detected', (max(0, x1), max(30, y1)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
                 if currentClass == "ball":
-                    cv2.putText(img, f'{total_mag}', (max(0, x1), max(30, y1)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+                    cv2.putText(img, f'{total_mag}', (max(30, x1), max(30, y1)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
     
         total_mag = line_render(center_points, img, line_color)
         #Draw line
