@@ -142,10 +142,10 @@ def line_render(points, img, line_color):
             #else: 
             #    cv2.line(img, points[i-1], points[i], (0, 255, 0), 2)
 
-    return round(angle, 2), round(bal_diff_y, 2), round(bal_diff_x, 2), counter 
+    return round(angle, 2), round(bal_diff_x, 2), round(bal_diff_y, 2), counter 
 while True:
     ret, img = cap.read() 
-    cv2.putText(img, f'output_path', (120, 120), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+    cv2.putText(img, f'output_path', (300, 700), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
     if not ret:
         break
 
