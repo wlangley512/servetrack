@@ -104,11 +104,11 @@ def line_render(points, img, line_color):
     #color = (0, 255, 255)
     if len(points) < 3:
         return
-    for i in range(3, len(points) - 1, 2):
+    for i in range(3, len(points) - 1):
         #print("X Point: ", points[i][0], file=lf)
         #total_mag = 0
-        segment1 = (points[i-2], points[i-1])
-        segment2 = (points[i-1], points[i])
+        segment1 = (points[i-2]+points[i-3], points[i-1]+points[i-2])
+        segment2 = (points[i-1]+points[i-2], points[i]+points[i-1])
 
         if points[i - 1] is None or points[i] is None:
             continue
