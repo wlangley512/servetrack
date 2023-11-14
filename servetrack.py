@@ -87,7 +87,7 @@ def calculate_angle(segment1, segment2):
     #angle_degrees = np.degrees(angle_radians)
     angle_radians = np.arctan2(np.linalg.det([vector1, vector2]), np.dot(vector1, vector2))
     angle_degrees = np.degrees(angle_radians)
-    return np.abs(angle_degrees)
+    return math.ceil(np.abs(angle_degrees))
 
 def line_render(points, img, line_color):
     balance = 30 / fps
@@ -131,7 +131,7 @@ def line_render(points, img, line_color):
             cv2.line(img, points[i-1], points[i], (0, 255, 0), 2)
             poop_diff = "Toss"
             tossed = True
-            if (bal_diff_y <= -10 and counter > 15 and np.abs(bal_diff_x) > 3):
+            if (bal_diff_y <= -10 and counter > 15 and np.abs(bal_diff_x) > 10):
                 if angle > 3 and angle < 30:
                     tossed = False
                     served = True
