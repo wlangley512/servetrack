@@ -14,8 +14,9 @@ import logging
 
 # Constants #
 video = sys.argv[1]
-max_deviation = int(sys.argv[3])
 min_conf=float(sys.argv[2])
+max_deviation = int(sys.argv[3])
+model_name = sys.argv[4]
 cap = cv2.VideoCapture(video)
 line_color = (0, 0, 0)
 total_mag = 0
@@ -23,7 +24,7 @@ mag_test = None
 prev_center_x = 0
 # Constants end #
 
-model=YOLO('Yolo-Weights/best100.pt')
+model=YOLO(model_name)
 classNames = ['ball']
 
 
