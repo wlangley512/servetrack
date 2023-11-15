@@ -145,7 +145,7 @@ def line_render(points, img, line_color):
             poop_diff = "Toss"
             tossed = True
             if (falling and np.abs(bal_diff_x) > 10):
-                if angle > 3 and angle < 30:
+                if angle > 20 and angle < 90:
                     tossed = False
                     served = True
         elif served:
