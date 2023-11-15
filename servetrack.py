@@ -76,27 +76,18 @@ def filter_outliers(center_points, max_deviation):
     
     return filtered_points
 
-#def calculate_angle(segment1, segment2): 
-#    vector1 = np.array([segment1[1][0] - segment1[0][0], segment1[1][1] - segment1[0][1]])
-#    vector2 = np.array([segment2[1][0] - segment2[0][0], segment2[1][1] - segment2[0][1]]) 
+def calculate_angle(segment1, segment2): 
+    vector1 = np.array([segment1[1][0] - segment1[0][0], segment1[1][1] - segment1[0][1]])
+    vector2 = np.array([segment2[1][0] - segment2[0][0], segment2[1][1] - segment2[0][1]]) 
     #dot_product = np.dot(vector1, vector2)
     #magnitude1 = np.linalg.norm(vector1)
     #magnitude2 = np.linalg.norm(vector2)
     #cosine_angle = dot_product / (magnitude1 * magnitude2)
     #angle_radians = np.arccos(np.clip(cosine_angle, -1.0, 1.0)) 
     #angle_degrees = np.degrees(angle_radians)
-#    angle_radians = np.arctan2(np.linalg.det([vector1, vector2]), np.dot(vector1, vector2))
-#    angle_degrees = np.degrees(angle_radians)
-#    return math.ceil(angle_degrees)
-
-def calculate_angle(point1, point2, point3):
-    vector1 = np.array([point1[0] - point2[0], point1[1] - point2[1]])
-    vector2 = np.array([point3[0] - point2[0], point3[1] - point2[1]])
-
     angle_radians = np.arctan2(np.linalg.det([vector1, vector2]), np.dot(vector1, vector2))
     angle_degrees = np.degrees(angle_radians)
-
-    return math.ceil(np.abs(angle_degrees))
+    return np.abs(math.ceil(angle_degrees))
 
 def line_render(points, img, line_color):
     balance = 30 / fps
@@ -113,11 +104,11 @@ def line_render(points, img, line_color):
     #color = (0, 255, 255)
     if len(points) < 3:
         return
-    for i in range(4, len(points) - 1):
+    for i in range(3, len(points) - 1):
         #print("X Point: ", points[i][0], file=lf)
         #total_mag = 0
-        segment1 = (points[i-4], points[i-2])
-        segment2 = (points[i-2], points[i])
+        segment1 = (points[i-2], points[i-1])
+        segment2 = (points[i-1], points[i])
 
         if points[i - 1] is None or points[i] is None:
             continue
@@ -126,7 +117,7 @@ def line_render(points, img, line_color):
         
         bal_diff_y = diff_y / balance
         bal_diff_x = diff_x / balance 
-        angle = calculate_angle(segment1[0], segment1[1], segment2[1])
+        angle = calculate_angle(segment1, segment2)
         
         if bal_diff_y < 0:
             consecutive_negative_frames += 1
