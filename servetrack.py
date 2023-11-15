@@ -119,7 +119,7 @@ def line_render(points, img, line_color):
         diff_y = points[i-1][1] - points[i][1]
         
         bal_diff_y = diff_y / balance
-        bal_diff_x = diff_x / balance 
+        bal_diff_x = math.ceil(diff_x / balance)
         angle = calculate_angle(segment1, segment2)
         
         if bal_diff_y < 0:
