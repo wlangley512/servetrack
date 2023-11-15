@@ -99,6 +99,7 @@ def line_render(points, img, line_color):
     bal_diff_x = 0
     consecutive_negative_frames = 0
     tossed =  True
+    falling = False
     served = False
     passed = False
     #color = (0, 255, 255)
@@ -107,6 +108,7 @@ def line_render(points, img, line_color):
     for i in range(3, len(points) - 1):
         #print("X Point: ", points[i][0], file=lf)
         #total_mag = 0
+        counter+=1
         segment1 = (points[i-2], points[i-1])
         segment2 = (points[i-1], points[i])
 
@@ -123,6 +125,8 @@ def line_render(points, img, line_color):
             consecutive_negative_frames += 1
         else: 
             consecutive_negative_frames = 0
+        if consecutive_negative_frames >= 3 and counter > 15:
+            falling = True
 
         #if bal_diff_y > 0:
         #    consecutive_positive_frames +=1 
@@ -132,7 +136,6 @@ def line_render(points, img, line_color):
         print("angle: " ,  angle, file=lf)
            
         #prevent false positive at start if player lower balls before toss
-        counter+=1
 
         #if this works it sucks
         #update: jesus christ
@@ -140,7 +143,7 @@ def line_render(points, img, line_color):
             cv2.line(img, points[i-1], points[i], (0, 255, 0), 2)
             poop_diff = "Toss"
             tossed = True
-            if (consecutive_negative_frames >= 5 and counter > 15 and np.abs(bal_diff_x) > 5):
+            if (falling and np.abs(bal_diff_x) > 5):
                 if angle > 3 and angle < 30:
                     tossed = False
                     served = True
