@@ -205,7 +205,7 @@ while True:
                 if currentClass == "ball":
                     cv2.putText(img, f'{total_mag}', (max(30, x1), max(30, y1)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
          
-        if towardaway = 1: # serving away
+        if towardaway == 1: # serving away
             total_mag = line_render_away(center_points, img, line_color)
         #elif towardaway = 0: #serving toward
         #    total_mag = 
