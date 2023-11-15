@@ -154,7 +154,7 @@ def line_render(points, img, line_color):
             #else: 
             #    cv2.line(img, points[i-1], points[i], (0, 255, 0), 2)
 
-    return round(angle, 2), round(bal_diff_x, 2), round(bal_diff_y, 2), consecutive_negative_frames 
+    return round(angle, 2), round(bal_diff_x, 2), round(bal_diff_y, 2), falling 
 while True:
     ret, img = cap.read() 
     cv2.putText(img, video, (300, 700), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
