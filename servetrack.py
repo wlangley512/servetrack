@@ -144,8 +144,8 @@ def line_render(points, img, line_color):
             cv2.line(img, points[i-1], points[i], (0, 255, 0), 2)
             poop_diff = "Toss"
             tossed = True
-            if (falling and np.abs(bal_diff_x) > 10):
-                if angle > 20 and angle < 90:
+            if (falling and np.abs(bal_diff_x) > 5):
+                if angle > 10 and angle < 90:
                     tossed = False
                     served = True
         elif served:
