@@ -22,7 +22,6 @@ cap = cv2.VideoCapture(video)
 line_color = (0, 0, 0)
 total_mag = 0
 mag_test = None
-prev_center_x = 0
 # Constants end #
 
 model=YOLO(model_name)
@@ -49,6 +48,7 @@ lf = open(log_file, 'w+')
 sys.stdout = log_file
 ####
 
+# video output
 lf.write(video)
 fps = cap.get(5)
 width = int(cap.get(3))
@@ -59,6 +59,7 @@ tframes = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 #output location
 final = cv2.VideoWriter(output_path,fourcc, fps, dim)
 progress=tqdm(total=tframes)
+#####
 
 count = 0
 
