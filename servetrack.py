@@ -35,14 +35,14 @@ while os.path.isfile(output_path):
     output_path = 'output/angletest/track%d.mp4' % filecount
 
 ####LOG MAKER for debugging purposes
-logcount = 0
-log_file = 'output/logs/angletest/log%d.txt' % logcount
-while os.path.isfile(log_file):
-    logcount += 1
-    log_file = 'output/logs/angletest/log%d.txt' % logcount
-os.makedirs(os.path.dirname(log_file), exist_ok=True)
-lf = open(log_file, 'w+')
-sys.stdout = log_file
+#logcount = 0
+#log_file = 'output/logs/angletest/log%d.txt' % logcount
+#while os.path.isfile(log_file):
+#    logcount += 1
+#    log_file = 'output/logs/angletest/log%d.txt' % logcount
+#os.makedirs(os.path.dirname(log_file), exist_ok=True)
+#lf = open(log_file, 'w+')
+#sys.stdout = log_file
 ####
 
 # video output
@@ -59,8 +59,8 @@ progress=tqdm(total=tframes)
 #####
 
 count = 0
-prev_frame_time = None
-prev_center_point = None
+#prev_frame_time = None
+#prev_center_point = None
 
 def filter_outliers(center_points, max_deviation):
     filtered_points = [center_points[0]]
@@ -78,10 +78,11 @@ def filter_outliers(center_points, max_deviation):
     
     return filtered_points
 
-def calculate_speed(prev_point, curr_point, time_difference):
-    distance = math.sqrt((curr_point[0] - prev_point[0]) ** 2 + (curr_point[1] - prev_point[1]) ** 2)
-    speed = distance / time_difference
-    return speed
+#pixels per second, not used
+#def calculate_speed(prev_point, curr_point, time_difference):
+#    distance = math.sqrt((curr_point[0] - prev_point[0]) ** 2 + (curr_point[1] - prev_point[1]) ** 2)
+#    speed = distance / time_difference
+#    return speed
 
 def calculate_angle(segment1, segment2): 
     vector1 = np.array([segment1[1][0] - segment1[0][0], segment1[1][1] - segment1[0][1]])
