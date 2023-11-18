@@ -46,7 +46,7 @@ while os.path.isfile(output_path):
 ####
 
 # video output
-lf.write(video)
+#lf.write(video)
 fps = cap.get(5)
 width = int(cap.get(3))
 height = int(cap.get(4))
@@ -94,11 +94,11 @@ def calculate_angle(segment1, segment2):
 def line_render_away(points, img, line_color):
     balance = 30 / fps
     counter = 0
-    #angle = 0
-    #diff_y = 0
-    #diff_x = 0
-    #bal_diff_y = 0
-    #bal_diff_x = 0
+    angle = 0
+    diff_y = 0
+    diff_x = 0
+    bal_diff_y = 0
+    bal_diff_x = 0
     consecutive_negative_frames = 0
     label = None
     tossed =  True
@@ -133,7 +133,7 @@ def line_render_away(points, img, line_color):
             falling = True
 
 
-        print("angle: " ,  angle, file=lf)
+        #print("angle: " ,  angle, file=lf)
            
         #if this works it sucks
         #update: jesus christ
@@ -141,7 +141,7 @@ def line_render_away(points, img, line_color):
             cv2.line(img, points[i-1], points[i], (0, 255, 0), 2)
             label = "Toss"
             tossed = True
-            if falling and diff_y > 0:
+            if falling and diff_y >= 0:
                     tossed = False
                     served = True
         elif served:
@@ -149,9 +149,10 @@ def line_render_away(points, img, line_color):
             cv2.line(img, points[i-1], points[i], (0, 0, 255), 2)
             #else: 
             #    cv2.line(img, points[i-1], points[i], (0, 255, 0), 2)
-
-    #return round(angle, 2), round(bal_diff_x, 2), round(bal_diff_y, 2), falling 
-    return label
+    
+    # For debugging
+    return round(angle, 2), round(bal_diff_x, 2), round(bal_diff_y, 2), falling 
+    #return label
 while True:
     ret, img = cap.read() 
     cv2.putText(img, video, (300, 700), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
@@ -193,10 +194,10 @@ while True:
 
                 currentClass = classNames[cls]
                 if currentClass == "ball":
-                    cv2.putText(img, f'{label}', (max(30, x1), max(30, y1)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+                    cv2.putText(img, f'{mag_test}', (max(30, x1), max(30, y1)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
          
         #if towardaway == 1: # serving away
-        label = line_render_away(center_points, img, line_color)
+        mag_test = line_render_away(center_points, img, line_color)
         #elif towardaway = 0: #serving toward
         #    total_mag = 
     
@@ -208,4 +209,4 @@ while True:
 
 final.release()
 progress.close()
-lf.close()
+#lf.close()
