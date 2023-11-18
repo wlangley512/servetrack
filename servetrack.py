@@ -1,7 +1,3 @@
-#github
-#create github
-#create serve detection
-
 import cv2
 import sys
 import numpy as np
@@ -19,6 +15,7 @@ min_conf=float(sys.argv[2])
 max_deviation = int(sys.argv[3])
 model_name = sys.argv[4]
 cap = cv2.VideoCapture(video)
+label = None
 line_color = (0, 0, 0)
 total_mag = 0
 mag_test = None
@@ -62,6 +59,8 @@ progress=tqdm(total=tframes)
 #####
 
 count = 0
+prev_frame_time = None
+prev_center_point = None
 
 def filter_outliers(center_points, max_deviation):
     filtered_points = [center_points[0]]
@@ -79,33 +78,32 @@ def filter_outliers(center_points, max_deviation):
     
     return filtered_points
 
+def calculate_speed(prev_point, curr_point, time_difference):
+    distance = math.sqrt((curr_point[0] - prev_point[0]) ** 2 + (curr_point[1] - prev_point[1]) ** 2)
+    speed = distance / time_difference
+    return speed
+
 def calculate_angle(segment1, segment2): 
     vector1 = np.array([segment1[1][0] - segment1[0][0], segment1[1][1] - segment1[0][1]])
     vector2 = np.array([segment2[1][0] - segment2[0][0], segment2[1][1] - segment2[0][1]]) 
-    #dot_product = np.dot(vector1, vector2)
-    #magnitude1 = np.linalg.norm(vector1)
-    #magnitude2 = np.linalg.norm(vector2)
-    #cosine_angle = dot_product / (magnitude1 * magnitude2)
-    #angle_radians = np.arccos(np.clip(cosine_angle, -1.0, 1.0)) 
-    #angle_degrees = np.degrees(angle_radians)
     angle_radians = np.arctan2(np.linalg.det([vector1, vector2]), np.dot(vector1, vector2))
     angle_degrees = np.degrees(angle_radians)
     return np.abs(math.ceil(angle_degrees))
 
 def line_render_away(points, img, line_color):
     balance = 30 / fps
-    angle = 0
     counter = 0
-    diff_y = 0
-    diff_x = 0
-    bal_diff_y = 0
-    bal_diff_x = 0
+    #angle = 0
+    #diff_y = 0
+    #diff_x = 0
+    #bal_diff_y = 0
+    #bal_diff_x = 0
     consecutive_negative_frames = 0
+    label = None
     tossed =  True
     falling = False
     served = False
     passed = False
-    #color = (0, 255, 255)
     if len(points) < 3:
         return
     for i in range(3, len(points) - 1):
@@ -118,7 +116,7 @@ def line_render_away(points, img, line_color):
         if points[i - 1] is None or points[i] is None:
             continue
         diff_x = points[i-1][0] - points[i][0]
-        diff_y = points[i-1][1] - points[i][1]
+        diff_y = points[i-2][1] - points[i][1]
         
         bal_diff_y = diff_y / balance
         bal_diff_x = math.ceil(diff_x / balance)
@@ -128,45 +126,37 @@ def line_render_away(points, img, line_color):
             consecutive_negative_frames += 1
         else: 
             consecutive_negative_frames = 0
+        
+        # Makes sure to suck me dry 
         if consecutive_negative_frames >= 3 and counter > 15:
             falling = True
 
-        #if bal_diff_y > 0:
-        #    consecutive_positive_frames +=1 
-        #else:
-        #    consecutive_positive_frames =0
 
         print("angle: " ,  angle, file=lf)
            
-        #prevent false positive at start if player lower balls before toss
-
         #if this works it sucks
         #update: jesus christ
         if tossed:
             cv2.line(img, points[i-1], points[i], (0, 255, 0), 2)
-            poop_diff = "Toss"
+            label = "Toss"
             tossed = True
-            if (falling and np.abs(bal_diff_x) > 5):
-                if angle > 10 and angle < 90:
+            if falling and diff_y > 0:
                     tossed = False
                     served = True
         elif served:
-            #if np.abs(diff_x) > 3 and np.abs(diff_y) > 3:
-            poop_diff = "Serv"
+            label = "Serv"
             cv2.line(img, points[i-1], points[i], (0, 0, 255), 2)
             #else: 
             #    cv2.line(img, points[i-1], points[i], (0, 255, 0), 2)
 
-    return round(angle, 2), round(bal_diff_x, 2), round(bal_diff_y, 2), falling 
+    #return round(angle, 2), round(bal_diff_x, 2), round(bal_diff_y, 2), falling 
+    return label
 while True:
     ret, img = cap.read() 
     cv2.putText(img, video, (300, 700), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
     if not ret:
         break
     
-    height, width, _ = img.shape
-    #print(height, width)
-    roi = img[50: 650, 150: 1050]
     progress.update(1)
     results = model(img, stream=True, verbose=False)
     for r in results:
@@ -183,7 +173,12 @@ while True:
                 # Center points for circle
                 cx = int((x1+x2)/2)
                 cy = int((y1+y2)/2)
+                current_center_point = (cx, cy)
                 x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2) 
+                
+                # Update previous frame variables
+                prev_frame_time = time.time()
+                prev_center_point = current_center_point
 
                 # Create mid points and bounding box
                 center_points.append((cx, cy)) 
@@ -195,25 +190,14 @@ while True:
                 # Outliers now filtered
                 center_points = filter_outliers(center_points, max_deviation)
 
-                #mag_test = change_line_color(center_points, img, line_color)
-                #print("line color after function call: ", line_color) 
                 currentClass = classNames[cls]
-                #if currentClass == "ball":
-                    #if line_color == (0, 255, 0):
-                    #    cv2.putText(img, f'{currentClass} {conf}', (max(0, x1), max(30, y1)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-                    #elif line_color == (0, 0, 255):
-                    #    cv2.putText(img, f'le epic serve detected', (max(0, x1), max(30, y1)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
                 if currentClass == "ball":
-                    cv2.putText(img, f'{total_mag}', (max(30, x1), max(30, y1)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+                    cv2.putText(img, f'{label}', (max(30, x1), max(30, y1)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
          
         #if towardaway == 1: # serving away
-        total_mag = line_render_away(center_points, img, line_color)
+        label = line_render_away(center_points, img, line_color)
         #elif towardaway = 0: #serving toward
         #    total_mag = 
-        #Draw line
-        #if len(center_points)>=2:
-        #    for i in range (1, len(center_points)):
-        #        cv2.line(img, center_points[i - 1], center_points[i], line_color, 2)
     
     
     final.write(img)
