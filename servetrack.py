@@ -138,17 +138,26 @@ def line_render_away(points, img, line_color):
         #if this works it sucks
         #update: jesus christ
         if tossed:
-            cv2.line(img, points[i-1], points[i], (0, 255, 0), 2)
-            label = "Toss"
-            tossed = True
-            if falling and diff_y >= 0:
-                    tossed = False
-                    served = True
+            if falling and diff_y >= 0: # Start of Serve Red Line
+                cv2.line(img, points[i-1], points[i], (0, 0, 255), 2)
+                tossed = False
+                falling = False
+                served = True
+            else:# Default Toss Green Line
+                cv2.line(img, points[i-1], points[i], (0, 255, 0), 2)
+                label = "Toss"
         elif served:
-            label = "Serv"
-            cv2.line(img, points[i-1], points[i], (0, 0, 255), 2)
-            #else: 
-            #    cv2.line(img, points[i-1], points[i], (0, 255, 0), 2)
+            if falling and diff_y >= 0: # Start of Pass Yellow Line
+                cv2.line(img, points[i-1], points[i], (0, 255, 255), 2)
+                served = False
+                passed = True
+            else:# Default Serve Red Line
+                label = "Serve"
+                cv2.line(img, points[i-1], points[i], (0, 0, 255), 2)
+        #elif passed: 
+        #    max_deviation = 20
+        #    label = "Pass"
+        #    cv2.line(img, points[i-1], points[i], (0, 255, 255), 2)
     
     # For debugging
     return round(angle, 2), round(bal_diff_x, 2), round(bal_diff_y, 2), falling 
