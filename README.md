@@ -20,12 +20,12 @@ pip install -r requirements.txt
 
 1. In your terminal navigate to the directory where you have cloned the repository.
 2. The script can be executed with the following command:
+3. Adjust the confidence and max_deviation as needed.
+4. Output videos will be located in the ```output/``` directory
 ```
 python yolotest.py --input_video_path --confidence(.0-1.0) --max_deviation_between_points
 ```
 <img src= "https://github.com/wlangley512/servetrack/blob/main/assets/sample_input.png">
-3. Adjust the confidence and max_deviation as needed.
-4. Output videos will be located in the ```output/``` directory
 
 ## Shortcomings
 1. The dataset used by Servetrack requires a moderately clear picture to detect the ball on successive frames. For example, detection quality might degrade if the camera angle is low and bright flourescent ceiling lights are visible. (Insert example gif of me.mp4)
