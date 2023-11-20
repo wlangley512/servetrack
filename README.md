@@ -1,6 +1,6 @@
 
 # Servetrack: Volleyball Serve Visualization
-
+<img src="https://github.com/wlangley512/servetrack/blob/main/assets/track3.gif">
 Python script that analyzes any clear video of a volleyball serve. We can track the trajectory of the ball and get lots of interesting data*! 
 Intended for use with scout camera view.
 *Interesting data output coming soon
