@@ -5,7 +5,6 @@ Python script that analyzes any clear video of a volleyball serve. We can track 
 Intended for use with scout camera view.
 *Interesting data output coming soon
 
-Insert Gifs Here
 ## Installation
 1. Clone the repository
 ```
@@ -28,7 +27,7 @@ python yolotest.py --input_video_path --confidence(.0-1.0) --max_deviation_betwe
 <img src= "https://github.com/wlangley512/servetrack/blob/main/assets/sample_input.png">
 
 ## Shortcomings
-1. The dataset used by Servetrack requires a moderately clear picture to detect the ball on successive frames. For example, detection quality might degrade if the camera angle is low and bright flourescent ceiling lights are visible. (Insert example gif of me.mp4)
+1. The dataset used by Servetrack requires a moderately clear picture to detect the ball on successive frames. For example, detection quality might degrade if the camera angle is low and bright flourescent ceiling lights are visible.
 2. If a false positive is detected before the actual ball, this can lead to the track line not being drawn at all. This can be worked around by using the less trained dataset or by tweaking the confidence values.
 3. New, much more robust, dataset will appear in the future. However, currently do not have the means to create a better one. So good output requires some tweaking!
 4. Currently only handles balls being served away from the camera, please keep this in mind when running tests.
