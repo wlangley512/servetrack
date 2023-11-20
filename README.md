@@ -23,6 +23,7 @@ pip install -r requirements.txt
 ```
 python yolotest.py --input_video_path --confidence(.0-1.0) --max_deviation_between_points
 ```
+<img src= "https://github.com/wlangley512/servetrack/blob/main/assets/sample_input.png">
 3. Adjust the confidence and max_deviation as needed.
 4. Output videos will be located in the ```output/``` directory
 
