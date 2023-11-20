@@ -20,7 +20,7 @@ pip install -r requirements.txt
 
 1. In your terminal navigate to the directory where you have cloned the repository.
 2. The script can be executed with the following command:
-3. Adjust the confidence and max_deviation as needed.
+3. Adjust the confidence and max_deviation as needed. I suggest starting with .5 or .6 confidence and 150 max_deviation. If your line starts to connect to false positives either lower max_deviation or raise confidence.
 4. Output videos will be located in the ```output/``` directory
 ```
 python yolotest.py --input_video_path --confidence(.0-1.0) --max_deviation_between_points
