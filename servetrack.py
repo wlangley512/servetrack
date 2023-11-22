@@ -1,11 +1,12 @@
-import cv2
 import sys
 import numpy as np
 from ultralytics import YOLO
 import math
+import cv2
 import time
 from tqdm import tqdm
-import os 
+import os
+from matplotlib import pyplot as plt
 
 # Constants #
 #towardaway = sys.argv[5]
@@ -15,9 +16,9 @@ max_deviation = int(sys.argv[3])
 model_name = sys.argv[4]
 cap = cv2.VideoCapture(video)
 label = None
-line_color = (0, 0, 0)
-total_mag = 0
-mag_test = None
+point_color = 'g'
+output_path_video = 'output/videos/'
+output_path_graph = 'output/graphs/'
 # Constants end #
 
 model=YOLO(model_name)
@@ -26,30 +27,43 @@ classNames = ['ball']
 
 center_points = []
 
-# Video output creation 
-filecount = 0
-output_path = 'output/'
-output_file = output_path + 'track%d.mp4' % filecount
-file_exists = os.path.exists(output_path)
-if not file_exists:
-    os.makedirs(output_path)
-while os.path.isfile(output_file):
-    filecount += 1
-    output_file = output_path + 'track%d.mp4' % filecount
+# Video and graph output creation 
+videocount = 0
+output_file_video = output_path_video + 'track%d.mp4' % videocount
+video_file_exists = os.path.exists(output_path_video)
+if not video_file_exists:
+    os.makedirs(output_path_video)
+while os.path.isfile(output_file_video):
+    videocount += 1
+    output_file_video = output_path_video + 'track%d.mp4' % videocount
+
+graphcount = 0
+output_file_graph = output_path_graph + 'graph%d.png' % graphcount
+graph_file_exists = os.path.exists(output_path_graph)
+if not graph_file_exists:
+    os.makedirs(output_path_graph)
+while os.path.isfile(output_file_graph):
+    graphcount += 1
+    output_file_graph = output_path_graph + 'graph%d.png' % graphcount
+######################################
 
 
-# video output constants
+# Video output constants
 fps = cap.get(5)
 width = int(cap.get(3))
 height = int(cap.get(4))
 dim = (width, height)
 fourcc = cv2.VideoWriter_fourcc(*'mp4v')
 tframes = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-final = cv2.VideoWriter(output_file,fourcc, fps, dim)
-#####
+final = cv2.VideoWriter(output_file_video,fourcc, fps, dim)
+######################################
 
 # Progress bar
 progress=tqdm(total=tframes)
+
+# plotting stuff
+fig = plt.figure()
+ax = plt.subplot(projection='3d')
 
 # Function to filter false positives
 def filter_outliers(center_points, max_deviation):
@@ -77,7 +91,8 @@ def calculate_angle(segment1, segment2):
     return np.abs(math.ceil(angle_degrees))
 
 # Function to track line of ball 
-def line_render_away(points, img, line_color):
+def line_render_away(points, img):
+    global point_color
     balance = 30 / fps
     counter = 0
     consecutive_negative_frames = 0
@@ -86,11 +101,10 @@ def line_render_away(points, img, line_color):
     falling = False
     served = False
     passed = False
-
     if len(points) < 3:
         return
 
-    for i in range(3, len(points) - 1):
+    for i in range(3, len(points)):
         counter+=1
         segment1 = (points[i-2], points[i-1])
         segment2 = (points[i-1], points[i])
@@ -119,31 +133,41 @@ def line_render_away(points, img, line_color):
         if tossed:
             if falling and diff_y >= 0: # Start of Serve Red Line
                 cv2.line(img, points[i-1], points[i], (0, 0, 255), 2)
+                point_color = 'r'
                 tossed = False
                 falling = False
                 served = True
             else:# Default Toss Green Line
                 cv2.line(img, points[i-1], points[i], (0, 255, 0), 2)
+                point_color = 'g'
                 label = "Toss"
         elif served:
             if falling and diff_y >= 0: # Start of Pass Yellow Line
                 cv2.line(img, points[i-1], points[i], (0, 255, 255), 2)
+                point_color = 'y'
                 served = False
                 passed = True
             else:# Default Serve Red Line
                 label = "Serve"
                 cv2.line(img, points[i-1], points[i], (0, 0, 255), 2)
+                point_color = 'r'
         elif passed: 
             max_deviation = 20
             label = "Pass"
             cv2.line(img, points[i-1], points[i], (0, 255, 255), 2)
+            point_color = 'y'
     
     return label
 
-
+count = 0
 while True:
     ret, img = cap.read() 
-    cv2.putText(img, video, (300, 700), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+    cv2.putText(img, video, (width-300, height-200), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+    cv2.putText(img, "Max deviation: " + f"{max_deviation}", (width-300, height-220), 
+                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+    cv2.putText(img, "Confidence: " + f"{min_conf}", (width-300, height-240), 
+                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+    
     if not ret:
         break
     
@@ -166,9 +190,6 @@ while True:
                 current_center_point = (cx, cy)
                 x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2) 
                 
-                # Update previous frame variables
-                prev_frame_time = time.time()
-                prev_center_point = current_center_point
 
                 # Create mid points and bounding box
                 center_points.append((cx, cy)) 
@@ -179,18 +200,24 @@ while True:
                 
                 # Outliers now filtered
                 center_points = filter_outliers(center_points, max_deviation)
-
                 currentClass = classNames[cls]
                 if currentClass == "ball":
-                    cv2.putText(img, f'{mag_test}', (max(30, x1), max(30, y1)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
-         
+                    cv2.putText(img, f'{label}', (max(30, x1), max(30, y1)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+
+                ax.view_init(10, 280) 
+                ax.scatter3D(cx, count, -cy, c = point_color)
         #if towardaway == 1: # serving away
-        mag_test = line_render_away(center_points, img, line_color)
+        label = line_render_away(center_points, img)
         #elif towardaway = 0: #serving toward
         #    total_mag = 
     
+    count +=1 
     final.write(img)
     cv2.waitKey(1)
-    
+
+plt.xlim(0, width)
+plt.gcf().set_size_inches(12, 12)
+plt.savefig(output_file_graph, dpi=150, bbox_inches='tight')
 final.release()
 progress.close()
+plt.show()

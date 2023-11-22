@@ -1,6 +1,6 @@
 
 # Servetrack: Volleyball Serve Visualization
-<img src="https://github.com/wlangley512/servetrack/blob/main/assets/track3.gif">
+<img src="https://github.com/wlangley512/servetrack/blob/main/assets/track78.gif"> | <img src="https://github.com/wlangley512/servetrack/blob/main/assets/sample_graph.png">
 Python script that analyzes any clear video of a volleyball serve. We can track the trajectory of the ball and get lots of interesting data*! 
 Intended for use with scout camera view.
 *Interesting data output coming soon
@@ -31,9 +31,10 @@ python yolotest.py --input_video_path --confidence(.0-1.0) --max_deviation_betwe
 2. If a false positive is detected before the actual ball, this can lead to the track line not being drawn at all. This can be worked around by using the less trained dataset or by tweaking the confidence values.
 3. New, much more robust, dataset will appear in the future. However, currently do not have the means to create a better one. So good output requires some tweaking! Sorry GitHub, the current dataset is temporary and will be replaced with a smaller one soon.
 4. Currently only handles balls being served away from the camera, please keep this in mind when running tests.
+5. Right now 3d plotting doesn't handle depth very well, currently focusing on this.
 
 ## Things to add:
 1. Better dataset that's also more lightweight
-2. 3d plot 
+2. Improvements to 3d plot 
 3. Speed/Break
 4. Input video dynamic ROI selection
