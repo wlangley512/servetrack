@@ -151,10 +151,12 @@ def line_render_away(points, img):
     global stopwatch
     global speed_flag 
     balance = 30 / fps
+    diff_y = 0
     global flag1
     global flag2 
     tossed =  True
     falling = False
+    falling2 = False
     served = False
     passed = False
     counter = 0
@@ -187,7 +189,12 @@ def line_render_away(points, img):
         # Makes sure ball is falling before checking for change in angle 
         if consecutive_negative_frames >= 3 and counter > 15:
             falling = True
+            counter = 0
 
+        # Makes sure ball is falling before checking for change in angle 
+        #if consecutive_negative_frames >= 7 and counter > 15:
+        #    falling = True
+        
         #if this works it sucks
         #update: jesus christ
         if tossed:
@@ -226,7 +233,7 @@ def line_render_away(points, img):
         print("stop")
         flag2 = False
     
-    return label, speed_flag
+    return label, speed_flag, counter, falling, consecutive_negative_frames, diff_y
 
 count = 0
 while True:
@@ -297,7 +304,7 @@ while True:
             #elif towardaway = 0: #serving toward
             #    total_mag = 
     
-    cv2.putText(img, "Label: " + f"{useful_data}", (width-300, height-280), 
+    cv2.putText(img, "Label: " + f"{useful_data}", (width-350, height-280), 
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
     cv2.putText(img, "Time: " + f"{elapsed_time:.2f}", (width-300, height-260), 
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
