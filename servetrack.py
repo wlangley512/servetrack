@@ -22,12 +22,12 @@ class Stopwatch:
         self.start_time = None
         return elapsed_time
 
+
 stopwatch = Stopwatch()
 
 useful_data = None 
 flag1 = True
 flag2 = True
-mph = .681818
 # Constants #
 #towardaway = sys.argv[5]
 video = sys.argv[1]
@@ -42,7 +42,6 @@ output_path_graph = 'output/graphs/'
 
 model=YOLO(model_name)
 classNames = ['ball']
-
 
 center_points = []
 
@@ -77,6 +76,8 @@ tframes = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 final = cv2.VideoWriter(output_file_video,fourcc, fps, dim)
 ######################################
 #####
+frame_count = 0
+radius = 0 
 first_frame = True
 font = cv2.FONT_HERSHEY_SIMPLEX 
 bl = []
@@ -89,9 +90,10 @@ dotcount = 0
 progress=tqdm(total=tframes)
 
 # plotting stuff
-fig = plt.figure()
-ax = plt.subplot(projection='3d')
-ax1 = plt.subplot(projection='3d')
+fig = plt.figure(212)
+ax = plt.subplot()
+ax1 = plt.subplot()
+
 
 def mouse_event(event, x, y, flags, params):
     global count, first_frame, bl, br, tl, tr
@@ -144,14 +146,24 @@ def calculate_angle(segment1, segment2):
     angle_degrees = np.degrees(angle_radians)
     return np.abs(math.ceil(angle_degrees))
 
+def speed(serve_frame_count, time_per_frame):
+    serve_time = serve_frame_count * time_per_frame
+    feetps = 60 / serve_time
+    mph = feetps * .681818
+    
+    return mph    
+
 # Function to track line of ball 
 def line_render_away(points, img):
     global point_color
     global elapsed_time
     global stopwatch
-    global speed_flag 
+    global speed_flag
+    serve_frame_count = 0
     balance = 30 / fps
+    time_per_frame = .03333 * balance
     diff_y = 0
+    mph = 0
     global flag1
     global flag2 
     tossed =  True
@@ -205,56 +217,69 @@ def line_render_away(points, img):
                 tossed = False
                 falling = False
                 served = True
-                #stopwatch.start()
             else:# Default Toss Green Line
                 cv2.line(img, points[i-1], points[i], (0, 255, 0), 2)
                 point_color = 'g'
                 label = "Toss"
         elif served:
+            serve_frame_count+=1
             if falling and diff_y >= 0: # Start of Pass Yellow Line
                 speed_flag = False
                 cv2.line(img, points[i-1], points[i], (0, 255, 255), 2)
                 point_color = 'y'
                 served = False 
-                #elapsed_time = stopwatch.stop()
                 passed = True
             else:# Default Serve Red Line
                 label = "Serve"
                 cv2.line(img, points[i-1], points[i], (0, 0, 255), 2)
                 point_color = 'r'
         elif passed:
-            max_deviation = 20
             label = "Pass"
             cv2.line(img, points[i-1], points[i], (0, 255, 255), 2)
             point_color = 'y'
     
     if speed_flag == False and flag2:
-        elapsed_time = stopwatch.stop()
-        print("stop")
+        mph = speed(serve_frame_count, time_per_frame)
+        print(mph)
         flag2 = False
     
-    return label, speed_flag, counter, falling, consecutive_negative_frames, diff_y
+    return label, speed_flag, counter, falling, consecutive_negative_frames, diff_y, serve_frame_count
 
-count = 0
 while True:
     ret, img = cap.read() 
     
+    #lab= cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
+    #l_channel, a, b = cv2.split(lab)
+
+# Applying CLAHE to L-channel
+# feel free to try different values for the limit and grid size:
+    #clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
+    #cl = clahe.apply(l_channel)
+
+# merge the CLAHE enhanced L-channel with the a and b channel
+    #limg = cv2.merge((cl,a,b))
+
+# Converting image from LAB Color model to BGR color spcae
+    #enhanced_img = cv2.cvtColor(limg, cv2.COLOR_LAB2BGR) 
     cv2.putText(img, video, (width-300, height-200), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
     cv2.putText(img, "Max deviation: " + f"{max_deviation}", (width-300, height-220), 
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
     cv2.putText(img, "Confidence: " + f"{min_conf}", (width-300, height-240), 
+                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2) 
+    cv2.putText(img, "Radius: " + f"{radius}", (width-300, height-300), 
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
-    
+    cv2.putText(img, "FPS: " + f"{fps}", (width-300, height-320), 
+                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
     if not ret:
         break
     
     progress.update(1)
-    results = model(img, stream=True, verbose=False)
     if first_frame:
         cv2.imshow("img", img)
         cv2.setMouseCallback('img', mouse_event)
     else:
         cv2.destroyAllWindows()
+        results = model(img, stream=True, verbose=False)
         for r in results:
             boxes = r.boxes
             useful_data = line_render_away(center_points, img)
@@ -266,17 +291,17 @@ while True:
                 
                 if conf > min_conf:
                     # Bounding Box
-                    x1, y1, x2, y2 = box.xyxy[0]
+                    x1, y1, x2,  y2 = box.xyxy[0]
                     # Center points for circle
                     cx = int((x1+x2)/2)
                     cy = int((y1+y2)/2)
                     current_center_point = (cx, cy)
-                    x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2) 
-                    
+                    x1, y1, w, h = int(x1), int(y1), int(x2), int(y2) 
+                    radius = int(((x2-x1) +(y2-y1))/4)
 
                     # Create mid points and bounding box
                     center_points.append((cx, cy)) 
-                    cv2.rectangle (img, (x1, y1), (x2, y2), (255, 255, 0), 1)
+                    cv2.circle(img, (cx, cy), radius,(255, 255, 0), 2)
                      
                     #for pt in center_points:
                             #     cv2.circle(img, pt, 2, (255, 0, 0), -1)
@@ -284,21 +309,22 @@ while True:
                     # Outliers now filtered
                     center_points = filter_outliers(center_points, max_deviation)
                     currentClass = classNames[cls]
-                    if currentClass == "ball":
-                        cv2.putText(img, f'{useful_data}', (max(30, x1), max(30, y1)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+                    #if currentClass == "ball":
+                    #    cv2.putText(img, f'{useful_data}', (max(30, x1), max(30, y1)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
 
                     
-                    ax.view_init(-90, -90)
+                    #ax.view_init(-90, -90)
                     
                     # Court
                     x, y, z = zip(*[point + [0] for point in [bl, br, tl, tr]])
                     x, y, z = np.array(x), np.array(y), np.array(y)
                     # Plotting the points and connecting lines in 3D
-                    ax.plot(x.tolist() + [x[0]], y.tolist() + [y[0]], 0, c='r', zorder=1)
-                    
+                    #ax.plot(x.tolist() + [x[0]], y.tolist() + [y[0]], 0, c='r', zorder=1)
+                    ax.plot(frame_count, cx, marker = 'o', c = 'r')
+                    ax1.plot(frame_count, 720-cy, marker = 'o', c ='g')
                     # Ball 
                     # pretty gross dot size code 
-                    ax.plot(cx, cy,0,zorder = 2,  marker = 'o', linewidth = 1, c = point_color, markersize=min(7,5-dotcount)) 
+                    #ax.plot(cx, cy,0, zorder = 2,  marker = 'o', linewidth = 1, c = point_color, markersize=min(7,5-dotcount)) 
                     dotcount+=0.03 
             #if towardaway == 1: # serving away
             #elif towardaway = 0: #serving toward
@@ -309,15 +335,15 @@ while True:
     cv2.putText(img, "Time: " + f"{elapsed_time:.2f}", (width-300, height-260), 
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
     cv2.waitKey(0)
-    count +=1 
+    frame_count +=1 
     final.write(img)
 
 print(elapsed_time)
-ax.set_zlim(height, 0)
-plt.xlim(0, width)
-plt.ylim(0, height)
+#ax.set_zlim(height, 0)
+#plt.xlim(0, width)
+#plt.ylim(0, height)
 
-plt.gcf().set_size_inches(12, 12)
+#plt.gcf().set_size_inches(12, 12)
 plt.savefig(output_file_graph, dpi=150, bbox_inches='tight')
 final.release()
 progress.close()
